@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>MyVendingMachine — {{ event.name }}</title>
+  <style>
+    body { font-family: sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 0; }
+    nav { background: #161b22; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    nav a { color: #58a6ff; text-decoration: none; margin-left: 16px; }
+    .identity { font-size: 12px; color: #8b949e; }
+    .container { max-width: 600px; margin: 32px auto; padding: 0 16px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    .flash.success { background: #0d2b1a; border: 1px solid #2ecc71; color: #2ecc71; }
+    .flash.error   { background: #2b0d0d; border: 1px solid #e74c3c; color: #e74c3c; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 28px; }
+    .emoji { font-size: 48px; }
+    h2 { margin: 12px 0 4px; }
+    .meta { color: #8b949e; font-size: 14px; margin-bottom: 16px; }
+    .price { color: #58a6ff; font-size: 18px; margin-bottom: 16px; }
+    button { padding: 9px 24px; background: #238636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; }
+    button:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🎟 MyVendingMachine</strong>
+    <div>
+      <span class="identity">{{ identity }}</span>
+      <a href="/">Events</a>
+      <a href="/my-tickets">My Tickets</a>
+    </div>
+  </nav>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <div class="card">
+      <div class="emoji">{{ event.emoji }}</div>
+      <h2>{{ event.name }}</h2>
+      <div class="meta">{{ event.date }} · {{ event.venue }}</div>
+      <div class="price">{{ event.price_eth }} ETH per ticket</div>
+      {% if event.available > 0 %}
+        <p style="color:#2ecc71;font-size:13px">{{ event.available }} tickets remaining</p>
+        <form action="/event/{{ event.id }}/buy" method="post">
+          <button type="submit">Buy 1 Ticket</button>
+        </form>
+      {% else %}
+        <p style="color:#e74c3c">Sold out</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

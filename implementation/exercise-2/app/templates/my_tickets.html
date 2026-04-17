@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>MyVendingMachine — My Tickets</title>
+  <style>
+    body { font-family: sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 0; }
+    nav { background: #161b22; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    nav a { color: #58a6ff; text-decoration: none; margin-left: 16px; }
+    .identity { font-size: 12px; color: #8b949e; }
+    .container { max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    .flash.success { background: #0d2b1a; border: 1px solid #2ecc71; color: #2ecc71; }
+    .flash.error   { background: #2b0d0d; border: 1px solid #e74c3c; color: #e74c3c; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th { text-align: left; padding: 10px; border-bottom: 2px solid #30363d; color: #8b949e; font-size: 13px; }
+    td { padding: 10px; border-bottom: 1px solid #21262d; font-size: 14px; }
+    .status-owned  { color: #2ecc71; font-weight: bold; }
+    .status-listed { color: #e67e22; font-weight: bold; }
+    input[type=number], input[type=text] { padding: 5px 8px; background: #0d1117; border: 1px solid #30363d; color: #e6edf3; border-radius: 4px; width: 90px; }
+    .btn { padding: 4px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; }
+    .btn-list   { background: #9b59b6; }
+    .btn-delist { background: #555; }
+    .btn-transfer { background: #1f6feb; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🎟 MyVendingMachine</strong>
+    <div>
+      <span class="identity">{{ identity }}</span>
+      <a href="/">Events</a>
+      <a href="/resale">Resale</a>
+    </div>
+  </nav>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <h2>My Tickets</h2>
+    {% if tickets %}
+    <table>
+      <tr>
+        <th>Event</th><th>Ticket #</th><th>Date</th><th>Status</th><th>Actions</th>
+      </tr>
+      {% for t in tickets %}
+      <tr>
+        <td>{{ t.emoji }} {{ t.name }}</td>
+        <td>#{{ t.id }}</td>
+        <td>{{ t.date }}</td>
+        <td>
+          {% if t.for_resale %}
+            <span class="status-listed">Listed ({{ t.resale_price_eth }} ETH)</span>
+          {% else %}
+            <span class="status-owned">Owned</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if not t.for_resale %}
+            <form method="post" action="/my-tickets/{{ t.id }}/list" style="display:inline">
+              <input type="number" name="resale_price" step="0.001" min="0.001" placeholder="ETH" required/>
+              <button type="submit" class="btn btn-list">List</button>
+            </form>
+            <form method="post" action="/transfer" style="display:inline;margin-left:6px">
+              <input type="hidden" name="ticket_id" value="{{ t.id }}"/>
+              {% if mode == "web2" %}
+                <input type="text" name="to_username" placeholder="username" required/>
+              {% else %}
+                <input type="text" name="to_address" placeholder="0x..." required style="width:160px"/>
+              {% endif %}
+              <button type="submit" class="btn btn-transfer">Transfer</button>
+            </form>
+          {% else %}
+            <form method="post" action="/my-tickets/{{ t.id }}/delist" style="display:inline">
+              <button type="submit" class="btn btn-delist">Delist</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p style="color:#8b949e">You don't own any tickets yet. <a href="/">Browse events</a>.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

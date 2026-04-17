@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+    nav { display: flex; gap: 16px; margin-bottom: 24px; }
+    nav a { color: #58a6ff; text-decoration: none; }
+    .badge { background: #b08800; color: #fff; font-size: 0.75em; padding: 2px 8px; border-radius: 4px; }
+    .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    label { display: block; color: #8b949e; font-size: 0.85em; margin-bottom: 4px; margin-top: 12px; }
+    input, select { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; padding: 6px 10px; width: 100%; box-sizing: border-box; }
+    button { background: #1f6feb; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; margin-top: 14px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; }
+    .flash.success { background: #0f2b18; border: 1px solid #3fb950; color: #3fb950; }
+    .flash.error { background: #2d1212; border: 1px solid #f85149; color: #f85149; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">← Shop</a>
+    <strong>Admin Panel</strong>
+    <span class="badge">⚠ Owner: {{ wallet[:6] }}...{{ wallet[-4:] }}</span>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="section">
+    <h3>Restock Product</h3>
+    <form method="POST" action="/admin/restock">
+      <label>Product</label>
+      <select name="product_id">
+        {% for p in products %}
+        <option value="{{ p.id }}">{{ p.name }} (stock: {{ p.stock }})</option>
+        {% endfor %}
+      </select>
+      <label>Quantity to add</label>
+      <input type="number" name="qty" value="10" min="1">
+      <button type="submit">Restock</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <h3>Add New Product</h3>
+    <form method="POST" action="/admin/add-product">
+      <label>Name</label>
+      <input type="text" name="name" placeholder="e.g. Water">
+      <label>Price (ETH)</label>
+      <input type="number" name="price_eth" step="0.0001" placeholder="0.001">
+      <label>Initial Stock</label>
+      <input type="number" name="stock" value="10" min="1">
+      <button type="submit">Add Product</button>
+    </form>
+  </div>
+</body>
+</html>

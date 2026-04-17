@@ -1,0 +1,8 @@
+node_modules/
+artifacts/
+cache/
+dist/
+typechain-types/
+app/__pycache__/
+app/venv/
+app/tickets.db

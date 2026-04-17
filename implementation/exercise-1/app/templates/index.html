@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vending Machine</title>
+  <style>
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+    nav { display: flex; gap: 16px; margin-bottom: 24px; align-items: center; }
+    nav a { color: #58a6ff; text-decoration: none; }
+    .wallet { font-size: 0.8em; color: #8b949e; margin-left: auto; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+    .card.sold-out { opacity: 0.5; }
+    .emoji { font-size: 2em; }
+    .price { color: #3fb950; font-weight: bold; }
+    .stock { color: #8b949e; font-size: 0.85em; }
+    input[type=number] { background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; width: 60px; }
+    button { background: #238636; color: white; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; }
+    button:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; }
+    .flash.success { background: #0f2b18; border: 1px solid #3fb950; color: #3fb950; }
+    .flash.error { background: #2d1212; border: 1px solid #f85149; color: #f85149; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🛒 Vending Machine</strong>
+    <a href="/my-items">My Items</a>
+    <a href="/admin">Admin</a>
+    <span class="wallet">{{ wallet[:6] }}...{{ wallet[-4:] }}</span>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="grid">
+    {% for p in products %}
+    <div class="card {% if p.stock == 0 %}sold-out{% endif %}">
+      <div class="emoji">{{ p.emoji }}</div>
+      <h3>{{ p.name }}</h3>
+      <div class="price">{{ p.price_eth }} ETH</div>
+      <div class="stock">Stock: {{ p.stock }}</div>
+      <form method="POST" action="/buy" style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+        <input type="hidden" name="product_id" value="{{ p.id }}">
+        <input type="number" name="qty" value="1" min="1" max="{{ p.stock }}" {% if p.stock == 0 %}disabled{% endif %}>
+        <button type="submit" {% if p.stock == 0 %}disabled{% endif %}>Buy</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

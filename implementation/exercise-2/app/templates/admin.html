@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>MyVendingMachine — Admin</title>
+  <style>
+    body { font-family: sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 0; }
+    nav { background: #161b22; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    nav a { color: #58a6ff; text-decoration: none; margin-left: 16px; }
+    .identity { font-size: 12px; color: #8b949e; }
+    .container { max-width: 700px; margin: 24px auto; padding: 0 16px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    .flash.success { background: #0d2b1a; border: 1px solid #2ecc71; color: #2ecc71; }
+    .flash.error   { background: #2b0d0d; border: 1px solid #e74c3c; color: #e74c3c; }
+    .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    label { display: block; font-size: 13px; color: #8b949e; margin-bottom: 4px; margin-top: 12px; }
+    input, select { width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; color: #e6edf3; border-radius: 4px; box-sizing: border-box; }
+    button { margin-top: 14px; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-create  { background: #9b59b6; color: white; }
+    .btn-release { background: #e67e22; color: white; }
+    .admin-badge { font-size: 12px; color: #e67e22; margin-bottom: 16px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🎟 MyVendingMachine</strong>
+    <div>
+      <span class="identity">{{ identity }}</span>
+      <a href="/">Events</a>
+      <a href="/my-tickets">My Tickets</a>
+    </div>
+  </nav>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <h2>Admin Panel</h2>
+    <div class="admin-badge">⚠ Admin only — {{ identity }}</div>
+
+    <div class="section">
+      <h3>Create Event</h3>
+      <form action="/admin/create-event" method="post">
+        <label>Event Name</label>
+        <input type="text" name="name" placeholder="e.g. Rock Night" required/>
+        <div class="grid2">
+          <div>
+            <label>Date</label>
+            <input type="text" name="date" placeholder="YYYY-MM-DD" required/>
+          </div>
+          <div>
+            <label>Venue</label>
+            <input type="text" name="venue" placeholder="Venue name" required/>
+          </div>
+        </div>
+        <div class="grid2">
+          <div>
+            <label>Total Tickets</label>
+            <input type="number" name="total_tickets" value="100" min="1" required/>
+          </div>
+          <div>
+            <label>Price (ETH)</label>
+            <input type="number" name="price_eth" step="0.001" placeholder="0.01" required/>
+          </div>
+        </div>
+        <label>Emoji</label>
+        <input type="text" name="emoji" placeholder="🎸" maxlength="2"/>
+        <button type="submit" class="btn-create">Create Event</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h3>Release Extra Tickets</h3>
+      <form action="/admin/release-tickets" method="post">
+        <label>Event</label>
+        <select name="event_id">
+          {% for e in events %}
+            <option value="{{ e.id }}">{{ e.emoji }} {{ e.name }} (available: {{ e.available }})</option>
+          {% endfor %}
+        </select>
+        <label>Quantity to Release</label>
+        <input type="number" name="qty" value="10" min="1"/>
+        <button type="submit" class="btn-release">Release</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

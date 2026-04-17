@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>MyVendingMachine — Events</title>
+  <style>
+    body { font-family: sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 0; }
+    nav { background: #161b22; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    nav a { color: #58a6ff; text-decoration: none; margin-left: 16px; }
+    .identity { font-size: 12px; color: #8b949e; }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    .flash.success { background: #0d2b1a; border: 1px solid #2ecc71; color: #2ecc71; }
+    .flash.error   { background: #2b0d0d; border: 1px solid #e74c3c; color: #e74c3c; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+    .card.sold-out { opacity: 0.5; }
+    .emoji { font-size: 32px; }
+    .card h3 { margin: 8px 0 4px; }
+    .meta { color: #8b949e; font-size: 13px; }
+    .price { color: #58a6ff; font-size: 14px; margin-top: 4px; }
+    .avail-ok    { color: #2ecc71; font-size: 13px; }
+    .avail-empty { color: #e74c3c; font-size: 13px; }
+    .btn { display: inline-block; margin-top: 12px; padding: 6px 16px; background: #238636; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .btn:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🎟 MyVendingMachine</strong>
+    <div>
+      <span class="identity">{{ identity }}</span>
+      <a href="/my-tickets">My Tickets</a>
+      <a href="/resale">Resale</a>
+      <a href="/admin" style="color:#e67e22">Admin</a>
+      {% if mode == "web2" %}<form method="post" action="/logout" style="display:inline"><button style="background:none;border:none;color:#58a6ff;cursor:pointer;margin-left:16px">Logout</button></form>{% endif %}
+    </div>
+  </nav>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <h2>Upcoming Events</h2>
+    <div class="grid">
+      {% for e in events %}
+      <div class="card {% if e.available == 0 %}sold-out{% endif %}">
+        <div class="emoji">{{ e.emoji }}</div>
+        <h3>{{ e.name }}</h3>
+        <div class="meta">{{ e.date }} · {{ e.venue }}</div>
+        <div class="price">{{ e.price_eth }} ETH</div>
+        {% if e.available > 0 %}
+          <div class="avail-ok">{{ e.available }} left</div>
+          <a href="/event/{{ e.id }}" class="btn">Buy Ticket</a>
+        {% else %}
+          <div class="avail-empty">Sold out</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

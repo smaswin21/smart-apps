@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Items</title>
+  <style>
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+    nav { display: flex; gap: 16px; margin-bottom: 24px; }
+    nav a { color: #58a6ff; text-decoration: none; }
+    .wallet { font-size: 0.8em; color: #8b949e; margin-left: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #21262d; }
+    th { color: #8b949e; font-size: 0.85em; }
+    .owned { color: #3fb950; font-weight: bold; }
+    .none { color: #484f58; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">← Shop</a>
+    <strong>My Items</strong>
+    <span class="wallet">{{ wallet[:6] }}...{{ wallet[-4:] }}</span>
+  </nav>
+
+  <table>
+    <thead><tr><th>Item</th><th>Owned</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.emoji }} {{ item.name }}</td>
+        <td class="{% if item.owned > 0 %}owned{% else %}none{% endif %}">{{ item.owned }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

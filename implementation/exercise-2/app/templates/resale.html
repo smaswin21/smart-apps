@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>MyVendingMachine — Resale Market</title>
+  <style>
+    body { font-family: sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 0; }
+    nav { background: #161b22; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    nav a { color: #58a6ff; text-decoration: none; margin-left: 16px; }
+    .identity { font-size: 12px; color: #8b949e; }
+    .container { max-width: 700px; margin: 24px auto; padding: 0 16px; }
+    .flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    .flash.success { background: #0d2b1a; border: 1px solid #2ecc71; color: #2ecc71; }
+    .flash.error   { background: #2b0d0d; border: 1px solid #e74c3c; color: #e74c3c; }
+    .listing { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .listing-info h3 { margin: 0 0 4px; }
+    .listing-info .meta { color: #8b949e; font-size: 13px; }
+    .listing-price { color: #58a6ff; font-size: 16px; text-align: right; }
+    button { margin-top: 6px; padding: 6px 16px; background: #238636; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <nav>
+    <strong>🎟 MyVendingMachine</strong>
+    <div>
+      <span class="identity">{{ identity }}</span>
+      <a href="/">Events</a>
+      <a href="/my-tickets">My Tickets</a>
+    </div>
+  </nav>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <h2>Resale Market</h2>
+    {% if listings %}
+      {% for l in listings %}
+      <div class="listing">
+        <div class="listing-info">
+          <h3>{{ l.emoji }} {{ l.name }} — Ticket #{{ l.id }}</h3>
+          <div class="meta">Seller: {{ l.seller }}</div>
+        </div>
+        <div class="listing-price">
+          {{ l.resale_price_eth }} ETH
+          <form method="post" action="/resale/{{ l.id }}/buy">
+            <button type="submit">Buy</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:#8b949e">No tickets currently listed for resale.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
