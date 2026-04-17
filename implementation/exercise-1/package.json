@@ -1,6 +1,7 @@
 {
   "name": "vending-machine-dapp",
   "version": "1.0.0",
+  "description": "",
   "scripts": {
     "test": "hardhat test",
     "compile": "hardhat compile",
